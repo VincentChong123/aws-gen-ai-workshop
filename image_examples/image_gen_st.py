@@ -8,6 +8,9 @@ st.subheader("Image Generation Demo")
 
 REGION = "us-west-2"
 
+# # Get user input for the prompt
+# prompt = st.text_input("Enter your prompt for image generation")
+
 # List of Stable Diffusion Preset Styles
 sd_presets = [
     "None",
@@ -112,3 +115,44 @@ def generate_image_titan(text):
 
 
 model = st.selectbox("Select model", ["Amazon Titan", "Stable Diffusion"])
+
+import base64
+from PIL import Image
+from io import BytesIO
+
+def base64_to_image(base64_string, image_path):
+    """
+    Converts a base64 string to an image file.
+
+    Args:
+        base64_string (str): The base64 string representing the image data.
+        image_path (str): The path where the image file should be saved.
+
+    Returns:
+        None
+    """
+    # Decode the base64 string
+    image_data = base64.b64decode(base64_string)
+
+    # Create a PIL Image object from the decoded data
+    image = Image.open(BytesIO(image_data))
+
+    # Save the image to the specified path
+    image.save(image_path)
+
+    print(f"saved image to {image_path}")
+
+
+if __name__ == "__main__":
+    # Get user input for the prompt
+    prompt = st.text_input("Enter your prompt for image generation", key="user prompt")
+
+    converted_img_path = "converted_output.jpg"
+
+    if model == "Stable Diffusion":
+        style = st.selectbox("Select style", sd_presets)
+        base64_string = generate_image_sd(prompt, style)
+        base64_to_image(base64_string, converted_img_path)
+        st.image(converted_img_path, caption="Generated image")
+
+
